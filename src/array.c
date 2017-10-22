@@ -1,4 +1,4 @@
-#include "array.h"
+#include "core/array.h"
 
 Array *arrayNew()
 {
@@ -103,11 +103,11 @@ void *arrayGet(Array *array, unsigned index)
 	return NULL;
 }
 
-void arrayRemove(Array *array, unsigned index)
+int arrayRemove(Array *array, unsigned index)
 {
 	assert(array != NULL);
 
-	if (index < array->length)
+	if (index < array->length && array->data[index] != NULL)
 	{
 		array->data[index] = NULL;
 
@@ -129,7 +129,11 @@ void arrayRemove(Array *array, unsigned index)
 
 			array->length--;
 		}
+
+		return 0;
 	}
+
+	return -1;
 }
 
 unsigned arrayLength(Array *array)

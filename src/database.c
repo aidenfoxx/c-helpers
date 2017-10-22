@@ -1,4 +1,4 @@
-#include "database.h"
+#include "core/database.h"
 
 static int databaseCallback();
 
@@ -81,32 +81,32 @@ void databaseQueryBindFloat(DatabaseQuery *query, float value)
 void databaseQueryBindVec2(DatabaseQuery *query, Vec2 value)
 {
 	assert(query != NULL);
-	sqlite3_bind_blob(query->statement, (++query->bound), &value, sizeof(Vec2), NULL);
+	sqlite3_bind_blob(query->statement, (++query->bound), &value, sizeof(Vec2), SQLITE_TRANSIENT);
 }
 
 void databaseQueryBindVec3(DatabaseQuery *query, Vec3 value)
 {
 	assert(query != NULL);
-	sqlite3_bind_blob(query->statement, (++query->bound), &value, sizeof(Vec3), NULL);
+	sqlite3_bind_blob(query->statement, (++query->bound), &value, sizeof(Vec3), SQLITE_TRANSIENT);
 }
 
 void databaseQueryBindVec4(DatabaseQuery *query, Vec4 value)
 {
 	assert(query != NULL);
-	sqlite3_bind_blob(query->statement, (++query->bound), &value, sizeof(Vec4), NULL);
+	sqlite3_bind_blob(query->statement, (++query->bound), &value, sizeof(Vec4), SQLITE_TRANSIENT);
 }
 
 void databaseQueryBindMat4(DatabaseQuery *query, Mat4 value)
 {
 	assert(query != NULL);
-	sqlite3_bind_blob(query->statement, (++query->bound), &value, sizeof(Mat4), NULL);
+	sqlite3_bind_blob(query->statement, (++query->bound), &value, sizeof(Mat4), SQLITE_TRANSIENT);
 }
 
 
 void databaseQueryBindString(DatabaseQuery *query, char *value)
 {
 	assert(query != NULL);
-	sqlite3_bind_text(query->statement, (++query->bound), value, -1, NULL);
+	sqlite3_bind_text(query->statement, (++query->bound), value, -1, SQLITE_TRANSIENT);
 }
 
 int databaseQueryExecute(DatabaseQuery *query)
@@ -134,7 +134,10 @@ int databaseQueryExecute(DatabaseQuery *query)
 	}
 }
 
-unsigned databaseQueryResults(DatabaseQuery *query, char ***results)
+/**
+ * TODO: Add error checking.
+ */
+int databaseQueryResults(DatabaseQuery *query, char ***results)
 {
 	assert(query != NULL);
 
@@ -157,18 +160,8 @@ unsigned databaseQueryResults(DatabaseQuery *query, char ***results)
 				 */
 				for (unsigned y = 0; y < query->columns; y++)
 				{
-					const unsigned index = (x * query->columns) + y;
-
 					const char *column = (const char*)sqlite3_column_text(query->statement, y);
-					const unsigned dataLength = strlen(column) + 1;
-
-					query->results[index] = NULL;
-
-					if (dataLength > 1)
-					{
-						query->results[index] = calloc(dataLength, sizeof(char));
-						strcpy(query->results[(x * query->columns) + y], column);
-					}
+					query->results[(x * query->columns) + y] = strdup(column);
 				}	
 			}
 		}

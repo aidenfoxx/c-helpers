@@ -1,4 +1,4 @@
-#include "hashtable.h"
+#include "core/hashtable.h"
 
 static void hashTableResize(HashTable*, unsigned);
 
@@ -41,11 +41,11 @@ void hashTableSet(HashTable *table, uint32_t key, void *data)
 
 		count++;
 
-		if (!table->entries[hashIndex].zero && !table->entries[hashIndex].key)
+		if (!table->entries[hashIndex].active && !table->entries[hashIndex].key)
 		{
-			table->entries[hashIndex].data = data;
-			table->entries[hashIndex].zero = key ? 0 : 1;
+			table->entries[hashIndex].active = 1;
 			table->entries[hashIndex].key = key;
+			table->entries[hashIndex].data = data;
 			
 			table->length++;
 
@@ -82,7 +82,7 @@ void *hashTableGet(HashTable *table, uint32_t key)
 		 * If there is a key, or the value is
 		 * intentionally zero, do check.
 		 */
-		if ((table->entries[hashIndex].key || table->entries[hashIndex].zero) && table->entries[hashIndex].key == key)
+		if (table->entries[hashIndex].active && table->entries[hashIndex].key == key)
 		{
 			return table->entries[hashIndex].data;
 		}
@@ -93,7 +93,7 @@ void *hashTableGet(HashTable *table, uint32_t key)
 	return NULL;
 }
 
-void hashTableRemove(HashTable *table, uint32_t key)
+int hashTableRemove(HashTable *table, uint32_t key)
 {
 	assert(table != NULL);
 
@@ -101,11 +101,12 @@ void hashTableRemove(HashTable *table, uint32_t key)
 
 	for (unsigned i = 0; i < table->count; i++)
 	{
-		if ((table->entries[hashIndex].key || table->entries[hashIndex].zero) && table->entries[hashIndex].key == key)
+		if (table->entries[hashIndex].active && table->entries[hashIndex].key == key)
 		{
-			table->entries[hashIndex].data = NULL;
-			table->entries[hashIndex].zero = 0;
+			table->entries[hashIndex].active = 0;
 			table->entries[hashIndex].key = 0;
+			table->entries[hashIndex].data = NULL;
+
 			table->length--;
 
 			/**
@@ -117,11 +118,13 @@ void hashTableRemove(HashTable *table, uint32_t key)
 				hashTableResize(table, floor(table->capacity / 2));
 			}
 
-			return;
+			return 0;
 		}
 		
 		hashIndex = hashIndex == (table->capacity - 1) ? 0 : hashIndex + 1;
 	}
+
+	return -1;
 }
 
 unsigned hashTableLength(HashTable *table)
@@ -151,7 +154,7 @@ unsigned hashTableData(HashTable *table, void ***data)
 				break;
 			}
 
-			if (table->entries[i].key || table->entries[i].zero)
+			if (table->entries[i].active)
 			{
 				temp[index] = table->entries[i].data;
 				index++;
@@ -183,7 +186,7 @@ void hashTableResize(HashTable *table, unsigned size)
 
 	for (unsigned i = 0; i < capacity; i++)
 	{
-		if (entries[i].key || entries[i].zero)
+		if (entries[i].active)
 		{
 			hashTableSet(table, entries[i].key, entries[i].data);
 		}

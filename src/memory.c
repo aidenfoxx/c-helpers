@@ -1,23 +1,9 @@
-#include "memory.h"
+#include "core/memory.h"
 
 static Memory *memory = NULL;
 
 static uint32_t memoryHash(uintptr_t);
 static void memoryResize(unsigned);
-
-uint32_t memoryHash(uintptr_t pointer)
-{
-    uint32_t hash = (uint32_t)pointer;
-
-    hash = ~hash + (hash << 15);
-    hash = hash ^ (hash >> 12);
-    hash = hash + (hash << 2);
-    hash = hash ^ (hash >> 4);
-    hash = hash * 2057;
-    hash = hash ^ (hash >> 16);
-
-    return hash;
-}
 
 void memoryInit()
 {
@@ -55,7 +41,7 @@ int memorySet(void *buffer, size_t size)
 
 	unsigned count = 0;
 	uintptr_t address = (uintptr_t)buffer;
-	unsigned bufferIndex = memoryHash(address) % (memory->capacity - 1);
+	unsigned bufferIndex = address % (memory->capacity - 1);
 
 	while (memory->count < memory->capacity)
 	{
@@ -78,7 +64,7 @@ int memorySet(void *buffer, size_t size)
 			memory->length++;
 
 			/**
-			 * If the hash table is over a certain
+			 * If the address table is over a certain
 			 * percent full, double the table size.
 			 */
 			if (memory->length > floor(memory->capacity * MEMORY_RESIZE_MAX))
@@ -105,7 +91,7 @@ int memoryRemove(void *buffer)
 	assert(memory != NULL);
 
 	uintptr_t address = (uintptr_t)buffer;
-	unsigned bufferIndex = memoryHash(address) % (memory->capacity - 1);
+	unsigned bufferIndex = address % (memory->capacity - 1);
 
 	for (unsigned i = 0; i < memory->count; i++)
 	{
@@ -132,6 +118,30 @@ int memoryRemove(void *buffer)
 	}
 
 	return -1;
+}
+
+size_t memorySize()
+{
+	assert(memory != NULL);
+
+	size_t size = 0;
+
+	for (unsigned i = 0; i < memory->capacity; i++)
+	{
+		if (memory->buffers[i].buffer)
+		{
+			size += memory->buffers[i].size;
+		}
+	}
+
+	return size;
+}
+
+unsigned memoryLength()
+{
+	assert(memory != NULL);
+
+	return memory->length;
 }
 
 void *memoryMalloc(size_t size, const char *file, unsigned line)
@@ -178,28 +188,6 @@ void *memoryCalloc(size_t size, size_t stride, const char *file, unsigned line)
 	return NULL;
 }
 
-void memoryFree(void *buffer, const char *file, unsigned line)
-{
-	if (buffer != NULL)
-	{
-		if (memory != NULL)
-		{
-			if (!memoryRemove(buffer))
-			{
-				(free)(buffer);
-				return;
-			}
-		}
-		else
-		{
-			(free)(buffer);
-			return;
-		}
-
-		printf("%s:%u: warning: failed to free memory buffer. possible double free?\n", file, line);
-	}
-}
-
 void *memoryRealloc(void *buffer, size_t size, const char *file, unsigned line)
 {
 	if (size > 0)
@@ -229,28 +217,26 @@ void *memoryRealloc(void *buffer, size_t size, const char *file, unsigned line)
 	return NULL;
 }
 
-size_t memoryBufferSize()
+void memoryFree(void *buffer, const char *file, unsigned line)
 {
-	assert(memory != NULL);
-
-	size_t size = 0;
-
-	for (unsigned i = 0; i < memory->capacity; i++)
+	if (buffer != NULL)
 	{
-		if (memory->buffers[i].buffer)
+		if (memory != NULL)
 		{
-			size += memory->buffers[i].size;
+			if (!memoryRemove(buffer))
+			{
+				(free)(buffer);
+				return;
+			}
 		}
+		else
+		{
+			(free)(buffer);
+			return;
+		}
+
+		printf("%s:%u: warning: failed to free memory buffer. possible double free?\n", file, line);
 	}
-
-	return size;
-}
-
-unsigned memoryBufferCount()
-{
-	assert(memory != NULL);
-
-	return memory->length;
 }
 
 void memoryResize(unsigned size)

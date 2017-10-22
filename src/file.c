@@ -1,4 +1,4 @@
-#include "file.h"
+#include "core/file.h"
 
 int fileRead(const char *path, char **data)
 {
@@ -26,6 +26,9 @@ int fileRead(const char *path, char **data)
 		 */
 		if (fread(temp, sizeof(char), length, file) == length) 
 		{
+			/**
+			 * On success, return the data to the pointer.
+			 */
 			*data = temp;
 			fclose(file);
 			return length;
@@ -33,10 +36,11 @@ int fileRead(const char *path, char **data)
 
 		fclose(file);
 		free(temp);
-		return FILE_ERROR;
+
+		return FILE_ERROR_READ;
 	}
 
-	return FILE_PERMISSIONS;
+	return FILE_ERROR_PERMISSIONS;
 }
 
 int fileWrite(const char *path, char *data, unsigned offset)
@@ -60,10 +64,10 @@ int fileWrite(const char *path, char *data, unsigned offset)
 		}
 
 		fclose(file);
-		return FILE_ERROR;
+		return FILE_ERROR_READ;
 	}
 
-	return FILE_PERMISSIONS;
+	return FILE_ERROR_PERMISSIONS;
 }
 
 int fileAppend(const char *path, char *data)
@@ -84,10 +88,10 @@ int fileAppend(const char *path, char *data)
 		}
 
 		fclose(file);
-		return FILE_ERROR;
+		return FILE_ERROR_READ;
 	}
 
-	return FILE_PERMISSIONS;
+	return FILE_ERROR_PERMISSIONS;
 }
 
 int fileBinaryRead(const char *path, uint8_t **data)
@@ -116,6 +120,9 @@ int fileBinaryRead(const char *path, uint8_t **data)
 		 */
 		if (fread(temp, sizeof(char), length, file) == length) 
 		{
+			/**
+			 * On success, return the data to the pointer.
+			 */
 			*data = temp;
 			fclose(file);
 			return length;
@@ -123,10 +130,10 @@ int fileBinaryRead(const char *path, uint8_t **data)
 
 		fclose(file);
 		free(temp);
-		return FILE_ERROR;
+		return FILE_ERROR_READ;
 	}
 
-	return FILE_PERMISSIONS;
+	return FILE_ERROR_PERMISSIONS;
 }
 
 int fileBinaryWrite(const char *path, uint8_t *data, unsigned offset, unsigned length)
@@ -150,10 +157,10 @@ int fileBinaryWrite(const char *path, uint8_t *data, unsigned offset, unsigned l
 
 		fclose(file);
 
-		return FILE_ERROR;
+		return FILE_ERROR_READ;
 	}
 
-	return FILE_PERMISSIONS;
+	return FILE_ERROR_PERMISSIONS;
 }
 
 int fileBinaryAppend(const char *path, uint8_t *data, unsigned length)
@@ -174,8 +181,8 @@ int fileBinaryAppend(const char *path, uint8_t *data, unsigned length)
 
 		fclose(file);
 
-		return FILE_ERROR;
+		return FILE_ERROR_READ;
 	}
 
-	return FILE_PERMISSIONS;
+	return FILE_ERROR_PERMISSIONS;
 }

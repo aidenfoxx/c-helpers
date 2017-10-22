@@ -1,4 +1,4 @@
-#include "hash.h"
+#include "core/hash.h"
 
 /**
  * Murmur3 hash function.
@@ -7,7 +7,6 @@
 uint32_t hashMurmur3(const char *key)
 {
 	uint32_t h1 = HASH_SEED;
-
 	int blocks = floor(strlen(key) / 4);
 	const uint8_t *data = (const uint8_t*)key;
 	const uint32_t *block = (const uint32_t*)(data + blocks * 4);
