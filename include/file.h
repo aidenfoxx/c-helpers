@@ -6,9 +6,11 @@
 #include <stdint.h>
 #include <string.h>
 
-#define FILE_SUCCESS 0
-#define FILE_ERROR -1
-#define FILE_PERMISSIONS -2
+typedef enum {
+	FILE_SUCCESS = 0,
+	FILE_ERROR_READ = INT_MIN,
+	FILE_ERROR_PERMISSIONS
+} FileStatus;
 
 int fileRead(const char*, char**);
 int fileWrite(const char*, char*, unsigned);

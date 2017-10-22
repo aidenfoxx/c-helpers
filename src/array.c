@@ -103,7 +103,7 @@ void *arrayGet(Array *array, unsigned index)
 	return NULL;
 }
 
-int arrayRemove(Array *array, unsigned index)
+ArrayStatus arrayRemove(Array *array, unsigned index)
 {
 	assert(array != NULL);
 
@@ -130,10 +130,10 @@ int arrayRemove(Array *array, unsigned index)
 			array->length--;
 		}
 
-		return 0;
+		return ARRAY_SUCCESS;
 	}
 
-	return -1;
+	return ARRAY_ERROR;
 }
 
 unsigned arrayLength(Array *array)

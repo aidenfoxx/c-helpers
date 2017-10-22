@@ -5,12 +5,15 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <limits.h>
 #include <sqlite3.h>
 
 #include "math.h"
 
-#define DATABASE_SUCCESS 0
-#define DATABASE_ERROR -1
+typedef enum {
+	DATABASE_SUCCESS = 0,
+	DATABASE_ERROR = INT_MIN
+} DatabaseStatus;
 
 typedef sqlite3 Database;
 
@@ -40,7 +43,7 @@ void databaseQueryBindMat4(DatabaseQuery*, Mat4);
 void databaseQueryBindString(DatabaseQuery*, char*);
 
 int databaseQueryExecute(DatabaseQuery*);
-unsigned databaseQueryResults(DatabaseQuery*, char***);
+int databaseQueryResults(DatabaseQuery*, char***);
 
 /**
  * Single function query execution.

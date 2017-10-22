@@ -11,6 +11,11 @@
 #define HASHTABLE_RESIZE_MAX .75
 #define HASHTABLE_RESIZE_MIN .25
 
+typedef enum {
+	HASHTABLE_SUCCESS = 0,
+	HASHTABLE_ERROR = INT_MIN
+} HasbtableStatus;
+
 typedef struct {
 	void **data;
 	uint8_t zero;
@@ -29,7 +34,7 @@ void hashTableFree(HashTable*);
 
 void hashTableSet(HashTable*, uint32_t, void*);
 void *hashTableGet(HashTable*, uint32_t);
-void hashTableRemove(HashTable*, uint32_t);
+int hashTableRemove(HashTable*, uint32_t);
 
 unsigned hashTableLength(HashTable*);
 unsigned hashTableData(HashTable*, void***);

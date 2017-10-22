@@ -118,13 +118,13 @@ int hashTableRemove(HashTable *table, uint32_t key)
 				hashTableResize(table, floor(table->capacity / 2));
 			}
 
-			return 0;
+			return HASHTABLE_SUCCESS;
 		}
 		
 		hashIndex = hashIndex == (table->capacity - 1) ? 0 : hashIndex + 1;
 	}
 
-	return -1;
+	return HASHTABLE_ERROR;
 }
 
 unsigned hashTableLength(HashTable *table)

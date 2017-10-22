@@ -9,6 +9,11 @@
 
 #define ARRAY_INITIAL_CAPACITY 2
 
+typedef enum {
+	ARRAY_SUCCESS = 0,
+	ARRAY_ERROR = INT_MIN
+} ArrayStatus;
+
 typedef struct {
 	unsigned length;
 	unsigned capacity;
@@ -23,7 +28,7 @@ void *arrayPop(Array*);
 
 void arraySet(Array*, unsigned, void*);
 void *arrayGet(Array*, unsigned);
-void arrayRemove(Array*, unsigned);
+int arrayRemove(Array*, unsigned);
 
 unsigned arrayLength(Array*);
 unsigned arrayData(Array*, void***);

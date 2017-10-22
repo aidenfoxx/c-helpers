@@ -21,7 +21,6 @@ void databaseClose(Database *database)
 	sqlite3_close(database);
 }
 
-
 DatabaseQuery *databaseQueryNew(Database *database, const char *sql)
 {
 	assert(database != NULL);
@@ -33,14 +32,15 @@ DatabaseQuery *databaseQueryNew(Database *database, const char *sql)
 	query->columns = 0;
 	query->results = NULL;
 
-	if (sqlite3_prepare(database, sql, -1, &query->statement, NULL) != SQLITE_OK)
+	if (sqlite3_prepare(database, sql, -1, &query->statement, NULL) == SQLITE_OK)
 	{
-		sqlite3_finalize(query->statement);
-		free(query);
-		return NULL;
+		return query;
 	}
 
-	return query;
+	sqlite3_finalize(query->statement);
+	free(query);
+
+	return NULL;
 }
 
 void databaseQueryDestroy(DatabaseQuery *query)
@@ -134,9 +134,6 @@ int databaseQueryExecute(DatabaseQuery *query)
 	}
 }
 
-/**
- * TODO: Add error checking.
- */
 int databaseQueryResults(DatabaseQuery *query, char ***results)
 {
 	assert(query != NULL);
@@ -176,8 +173,7 @@ int databaseExecute(Database *database, const char *sql)
 {
 	assert(database != NULL);
 
-	int status = DATABASE_ERROR;
-
+	DatabaseStatus status = DATABASE_ERROR;
 	DatabaseQuery *query;
 
 	if ((query = databaseQueryNew(database, sql)) != NULL)
