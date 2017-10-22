@@ -1,4 +1,4 @@
-#include "core/hash.h"
+#include "hash.h"
 
 /**
  * Murmur3 hash function.

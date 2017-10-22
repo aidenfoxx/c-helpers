@@ -1,4 +1,4 @@
-#include "core/database.h"
+#include "database.h"
 
 static int databaseCallback();
 

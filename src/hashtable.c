@@ -1,4 +1,4 @@
-#include "core/hashtable.h"
+#include "hashtable.h"
 
 static void hashTableResize(HashTable*, unsigned);
 

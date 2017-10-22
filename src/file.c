@@ -1,4 +1,4 @@
-#include "core/file.h"
+#include "file.h"
 
 int fileRead(const char *path, char **data)
 {

@@ -1,4 +1,4 @@
-#include "core/array.h"
+#include "array.h"
 
 Array *arrayNew()
 {

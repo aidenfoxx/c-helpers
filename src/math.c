@@ -1,4 +1,4 @@
-#include "core/math.h"
+#include "math.h"
 
 Vec2 vec2(float x, float y)
 {

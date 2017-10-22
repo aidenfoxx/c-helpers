@@ -1,4 +1,4 @@
-#include "core/memory.h"
+#include "memory.h"
 
 static Memory *memory = NULL;
 
